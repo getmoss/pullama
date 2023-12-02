@@ -1,0 +1,43 @@
+name: Pullama minimal test on a PR
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    services:
+      ollama:
+        options: "--name ollama"
+        image: ollama/ollama
+        ports:
+          - 11434:11434
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - ollama:/root/.ollama
+
+    steps:
+      - uses: actions/cache@v3.3.2
+        with:
+          key: ollama-cache
+          path: ollama
+      - run: docker ps -a
+      - run: docker exec ollama ollama pull llama2
+      - uses: actions/cache@v3.3.2
+        with:
+          key: ollama-cache
+          path: ollama
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch origin ${{ github.base_ref }}:${{ github.base_ref }}
+        shell: sh
+
+      - name: Run pullama
+        uses: ./
+        id: pullama
+        with:
+          server: http://localhost:11434
+        
