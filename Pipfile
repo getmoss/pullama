@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gitpython = "*"
+click = "*"
+lancedb = "*"
+langchain = "*"
+unstructured = "*"
+esprima = "*"
+fastembed = "*"
+qdrant-client = "*"
+sync = "*"
+
+[dev-packages]
+ruff = "*"
+
+[requires]
+python_version = "3.11"

@@ -1,0 +1,43 @@
+name: 'pullama'
+description: 'pullama action'
+inputs:
+  impact_analysis:
+    required: false
+    description: Flag indicating full repo impact assessment
+    default: "false"
+  target: 
+    required: true
+    description: The target branch for comparison. Defaults to the base ref.
+    default: ${{ github.base_ref }}
+  server:
+    required: true
+    description: "The ollama address reachable during the build"
+  source:
+    required: false
+    description: "The source of the change"
+    default: ${{ github.sha }}
+  path:
+    required: false
+    description: The repository path
+    default: ${{ github.workspace }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set env variables
+      id: token-env
+      shell: sh
+      run: |-
+        TOKENIZERS_PARALLELISM=true
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11.6'
+    
+    - run: |- 
+        pip install pipenv
+        pipenv install
+      shell: sh
+
+    - run: pipenv run python -m pullama -r ${{ inputs.path }} -s ${{ inputs.source }} -t ${{ inputs.target }} --server ${{ inputs.server }}
+      shell: sh
